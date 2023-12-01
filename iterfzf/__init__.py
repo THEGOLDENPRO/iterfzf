@@ -135,4 +135,4 @@ def iterfzf(
             try:
                 return output[0], value_list
             except IndexError:
-                return None
+                return None, value_list
