@@ -5,7 +5,9 @@ from os import fspath, PathLike
 from pathlib import Path
 import subprocess
 import sys
-from typing import AnyStr, Iterable, Literal, Optional, List
+from typing import AnyStr, Iterable, Literal, Optional, List, Tuple, TypeVar
+
+T = TypeVar("T")
 
 __all__ = '__fzf_version__', '__version__', 'BUNDLED_EXECUTABLE', 'iterfzf'
 
@@ -23,7 +25,7 @@ BUNDLED_EXECUTABLE: Optional[Path] = \
 
 
 def iterfzf(
-    iterable: Iterable[AnyStr],
+    iterable: Iterable[Tuple[AnyStr, T]],
     *,
     # Search mode:
     extended: bool = True,
@@ -67,10 +69,11 @@ def iterfzf(
     byte = None
     lf = u'\n'
     cr = u'\r'
-    iterable_list: List[AnyStr] = [] # NEW in this fork. 
+    value_list: List[AnyStr] = [] # NEW in this fork. 
     # (I know this defeats the whole point of generators but I NEED the choices to be returned in the project I'm utilizing this)
     for line in iterable:
-        iterable_list.append(line)
+        value_list.append(line[1])
+        line = line[0]
 
         if byte is None:
             byte = isinstance(line, bytes)
@@ -120,16 +123,16 @@ def iterfzf(
     if print_query:
         try:
             if multi:
-                return output[0], output[1:], iterable_list
+                return output[0], output[1:], value_list
             else:
-                return output[0], output[1], iterable_list
+                return output[0], output[1], value_list
         except IndexError:
             return output[0], None
     else:
         if multi:
-            return output, iterable_list
+            return output, value_list
         else:
             try:
-                return output[0], iterable_list
+                return output[0], value_list
             except IndexError:
                 return None
