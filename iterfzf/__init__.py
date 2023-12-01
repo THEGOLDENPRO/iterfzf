@@ -111,7 +111,7 @@ def iterfzf(
         if print_query:
             return None, None
         else:
-            return None
+            return None, value_list
     try:
         stdin.close()
     except IOError as e:
